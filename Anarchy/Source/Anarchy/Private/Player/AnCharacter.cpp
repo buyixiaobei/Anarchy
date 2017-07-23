@@ -3,11 +3,27 @@
 #include "AnCharacter.h"
 
 
-// Sets default values
+// ÉèÖÃÄ¬ÈÏÖµ
 AAnCharacter::AAnCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	//GetMesh()->bOnlyOwnerSee = false;
+	//GetMesh()->bOwnerNoSee = true;
+	//GetMesh()->bReceivesDecals = false;
+	//GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	//GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	//GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	//PrimaryActorTick.bCanEverTick = true;
+	//TargetingSpeedModifier = 0.5f;
+	//bIsTargeting = false;
+	//RunningSpeedModifier = 1.5f;
+	//bWantsToRun = false;
+	//bWantsToFire = false;
+	//LowHealthPercentage = 0.5f;
+	//BaseTurnRate = 45.f;
+	//BaseLookUpRate = 45.f;
 
 }
 
@@ -118,66 +134,66 @@ FRotator AAnCharacter::GetAimOffsets() const
 //}
 
 
-float AAnCharacter::PlayAnimMontage(UAnimMontage * AnimMontage, float InPlayRate, FName StartSectionName)
-{
-	return 0.0f;
-}
+//float AAnCharacter::PlayAnimMontage(UAnimMontage * AnimMontage, float InPlayRate, FName StartSectionName)
+//{
+//	return 0.0f;
+//}
+//
+//void AAnCharacter::StopAnimMontage(UAnimMontage * AnimMontage)
+//{
+//}
+//
+//void AAnCharacter::StopAllAnimMontages()
+//{
+//}
+//
+//void AAnCharacter::SetupPlayerInputComponent(UInputComponent * InputComponent)
+//{
+//}
 
-void AAnCharacter::StopAnimMontage(UAnimMontage * AnimMontage)
-{
-}
-
-void AAnCharacter::StopAllAnimMontages()
-{
-}
-
-void AAnCharacter::SetupPlayerInputComponent(UInputComponent * InputComponent)
-{
-}
-
-USkeletalMeshComponent * AAnCharacter::GetPawnMesh() const
-{
-	return nullptr;
-}
-
-FName AAnCharacter::GetWeaponAttachName() const
-{
-	return FName();
-}
-
-int32 AAnCharacter::GetInventoryCount() const
-{
-	return int32();
-}
-
-AShooterWeapon * AAnCharacter::GetInventoryWeapon(int32 index) const
-{
-	return nullptr;
-}
-
-float AAnCharacter::GetTargetingSpeedModifier() const
-{
-	return 0.0f;
-}
-
-bool AAnCharacter::IsTargeting() const
-{
-	return false;
-}
-
-bool AAnCharacter::IsFiring() const
-{
-	return false;
-}
-
-float AAnCharacter::GetRunningSpeedModifier() const
-{
-	return 0.0f;
-}
-
-void AAnCharacter::SetRunning(bool bNewRunning, bool bToggle)
-{
-}
+//USkeletalMeshComponent * AAnCharacter::GetPawnMesh() const
+//{
+//	return nullptr;
+//}
+//
+//FName AAnCharacter::GetWeaponAttachName() const
+//{
+//	return FName();
+//}
+//
+//int32 AAnCharacter::GetInventoryCount() const
+//{
+//	return int32();
+//}
+//
+//AShooterWeapon * AAnCharacter::GetInventoryWeapon(int32 index) const
+//{
+//	return nullptr;
+//}
+//
+//float AAnCharacter::GetTargetingSpeedModifier() const
+//{
+//	return 0.0f;
+//}
+//
+//bool AAnCharacter::IsTargeting() const
+//{
+//	return false;
+//}
+//
+//bool AAnCharacter::IsFiring() const
+//{
+//	return false;
+//}
+//
+//float AAnCharacter::GetRunningSpeedModifier() const
+//{
+//	return 0.0f;
+//}
+//
+//void AAnCharacter::SetRunning(bool bNewRunning, bool bToggle)
+//{
+//}
 
 bool AAnCharacter::IsRunning() const
 {
@@ -188,3 +204,130 @@ bool AAnCharacter::IsRunning() const
 	return false;
 }
 
+//bool AAnCharacter::IsFirstPerson() const
+//{
+//	return false;
+//}
+//
+//int32 AAnCharacter::GetMaxHealth() const
+//{
+//	return int32();
+//}
+//
+//bool AAnCharacter::IsAlive() const
+//{
+//	return false;
+//}
+//
+//float AAnCharacter::GetLowHealthPercentage() const
+//{
+//	return 0.0f;
+//}
+//
+//void AAnCharacter::UpdateTeamColorsAllMIDs()
+//{
+//}
+//
+//void AAnCharacter::UpdateRunSounds()
+//{
+//}
+//
+//void AAnCharacter::UpdatePawnMeshes()
+//{
+//}
+//
+//void AAnCharacter::UpdateTeamColors(UMaterialInstanceDynamic * UseMID)
+//{
+//}
+//
+//void AAnCharacter::TornOff()
+//{
+//}
+//
+//bool AAnCharacter::IsMoving()
+//{
+//	return false;
+//}
+
+//float AAnCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+//{
+//	return 0.0f;
+//}
+
+//void AAnCharacter::Suicide()
+//{
+//}
+//
+//void AAnCharacter::KilledBy(APawn * EventInstigator)
+//{
+//}
+//
+//bool AAnCharacter::CanDie(float KillingDamage, FDamageEvent const & DamageEvent, AController * Killer, AActor * DamageCauser) const
+//{
+//	return false;
+//}
+//
+//bool AAnCharacter::Die(float KillingDamage, FDamageEvent const & DamageEvent, AController * Killer, AActor * DamageCauser)
+//{
+//	return false;
+//}
+
+//void AAnCharacter::FellOutOfWorld(const UDamageType & dmgType)
+//{
+//}
+//
+//void AAnCharacter::PreReplication(IRepChangedPropertyTracker & ChangedPropertyTracker)
+//{
+//}
+
+//void AAnCharacter::OnDeath(float KillingDamage, FDamageEvent const & DamageEvent, APawn * InstigatingPawn, AActor * DamageCauser)
+//{
+//}
+//
+//void AAnCharacter::PlayHit(float DamageTaken, FDamageEvent const & DamageEvent, APawn * PawnInstigator, AActor * DamageCauser)
+//{
+//}
+//
+//void AAnCharacter::SetRagdollPhysics()
+//{
+//}
+//
+//void AAnCharacter::ReplicateHit(float Damage, FDamageEvent const & DamageEvent, APawn * InstigatingPawn, AActor * DamageCauser, bool bKilled)
+//{
+//}
+//
+//void AAnCharacter::OnRep_LastTakeHitInfo()
+//{
+//}
+
+/*oid AAnCharacter::SetCurrentWeapon(AShooterWeapon * NewWeapon, AShooterWeapon * LastWeapon)
+{
+}*/
+
+/*oid AAnCharacter::OnRep_CurrentWeapon(AShooterWeapon * LastWeapon)
+{
+}*/
+
+//void AAnCharacter::SpawnDefaultInventory()
+//{
+//}
+//
+//void AAnCharacter::DestroyInventory()
+//{
+//}
+
+//oid AAnCharacter::ServerEquipWeapon(AShooterWeapon * NewWeapon)
+//{
+//}
+
+//void AAnCharacter::ServerSetTargeting(bool bNewTargeting)
+//{
+//}
+
+//void AAnCharacter::ServerSetRunning(bool bNewRunning, bool bToggle)
+//{
+//}
+
+//void AAnCharacter::BuildPauseReplicationCheckPoints(TArray<FVector>& RelevancyCheckPoints)
+//{
+//}
