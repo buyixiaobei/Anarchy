@@ -67,10 +67,11 @@ void AAnCharacter::BeginPlay()
 //{
 //}
 //
-//FRotator AAnCharacter::GetAimOffsets() const
-//{
-//	return FRotator();
-//}
+FRotator AAnCharacter::GetAimOffsets() const
+{
+	return FRotator();
+}
+
 //
 //bool AAnCharacter::IsEnemyFor(AController * TempController) const
 //{
@@ -115,4 +116,75 @@ void AAnCharacter::BeginPlay()
 //void AAnCharacter::SetTargeting(bool bNewTargeting)
 //{
 //}
+
+
+float AAnCharacter::PlayAnimMontage(UAnimMontage * AnimMontage, float InPlayRate, FName StartSectionName)
+{
+	return 0.0f;
+}
+
+void AAnCharacter::StopAnimMontage(UAnimMontage * AnimMontage)
+{
+}
+
+void AAnCharacter::StopAllAnimMontages()
+{
+}
+
+void AAnCharacter::SetupPlayerInputComponent(UInputComponent * InputComponent)
+{
+}
+
+USkeletalMeshComponent * AAnCharacter::GetPawnMesh() const
+{
+	return nullptr;
+}
+
+FName AAnCharacter::GetWeaponAttachName() const
+{
+	return FName();
+}
+
+int32 AAnCharacter::GetInventoryCount() const
+{
+	return int32();
+}
+
+AShooterWeapon * AAnCharacter::GetInventoryWeapon(int32 index) const
+{
+	return nullptr;
+}
+
+float AAnCharacter::GetTargetingSpeedModifier() const
+{
+	return 0.0f;
+}
+
+bool AAnCharacter::IsTargeting() const
+{
+	return false;
+}
+
+bool AAnCharacter::IsFiring() const
+{
+	return false;
+}
+
+float AAnCharacter::GetRunningSpeedModifier() const
+{
+	return 0.0f;
+}
+
+void AAnCharacter::SetRunning(bool bNewRunning, bool bToggle)
+{
+}
+
+bool AAnCharacter::IsRunning() const
+{
+	if (!GetCharacterMovement()) 
+	{
+		return false;
+	}
+	return false;
+}
 
