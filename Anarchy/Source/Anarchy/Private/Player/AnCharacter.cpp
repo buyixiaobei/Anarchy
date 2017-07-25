@@ -6,16 +6,22 @@
 
 
 // 设置默认值
-AAnCharacter::AAnCharacter()
+AAnCharacter::AAnCharacter(const FObjectInitializer& ObjectInitializer) 
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAnMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
-	GetMesh()->bOnlyOwnerSee = false;
-	GetMesh()->bOwnerNoSee = true;
-	GetMesh()->bReceivesDecals = false;
-	GetMesh()->SetCollisionObjectType(ECC_Pawn);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	//GetMesh()->bOnlyOwnerSee = false;
+	//GetMesh()->bOwnerNoSee = true;
+	//GetMesh()->bReceivesDecals = true;
+	//GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	//GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	//GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	PrimaryActorTick.bCanEverTick = true;
 	TargetingSpeedModifier = 0.5f;
@@ -26,31 +32,30 @@ AAnCharacter::AAnCharacter()
 	LowHealthPercentage = 0.5f;
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
-
 }
 
-// Called when the game starts or when spawned
 void AAnCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-//// 开始销毁
-//void AAnCharacter::BeginDestroy()
-//{
-//	Super::BeginDestroy();
-//}
-//
-//// 生成时的组件初始化
-//void AAnCharacter::PostInitializeComponents()
-//{
-//}
-//
-//void AAnCharacter::PawnClientRestart()
-//{
-//}
-//
+// 生成时的组件初始化
+void AAnCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	if(Role == ROLE_Authority)
+	{
+		Health = GetMaxHealth();
+	}
+}
+
+void AAnCharacter::PawnClientRestart()
+{
+	Super::PawnClientRestart();
+}
+
 //void AAnCharacter::PossessedBy(AController * C)
 //{
 //}
@@ -75,20 +80,126 @@ void AAnCharacter::BeginPlay()
 //
 //}
 //
-//// Called to bind functionality to input
-//void AAnCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-//{
-//	Super::SetupPlayerInputComponent(PlayerInputComponent);
-//
-//}
+
+void AAnCharacter::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
+// 绑定输入事件
+void AAnCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	check(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &AAnCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AAnCharacter::MoveRight);
+
+	PlayerInputComponent->BindAxis("MoveUp", this, &AAnCharacter::MoveUp);
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("TurnRate", this, &AAnCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &AAnCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAnCharacter::OnStartJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAnCharacter::OnStopJump);
+
+	//PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AAnCharacter::OnStartRunning);
+	//PlayerInputComponent->BindAction("RunToggle", IE_Pressed, this, &AAnCharacter::OnStartRunningToggle);
+	//PlayerInputComponent->BindAction("Run", IE_Released, this, &AAnCharacter::OnStopRunning);
+
+
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShooterCharacter::OnStartFire);
+	//PlayerInputComponent->BindAction("Fire", IE_Released, this, &AShooterCharacter::OnStopFire);
+
+	//PlayerInputComponent->BindAction("Targeting", IE_Pressed, this, &AShooterCharacter::OnStartTargeting);
+	//PlayerInputComponent->BindAction("Targeting", IE_Released, this, &AShooterCharacter::OnStopTargeting);
+
+	//PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, this, &AShooterCharacter::OnNextWeapon);
+	//PlayerInputComponent->BindAction("PrevWeapon", IE_Pressed, this, &AShooterCharacter::OnPrevWeapon);
+
+	//PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterCharacter::OnReload);
+
+
+
+}
+
+
+// 前后移动
+void AAnCharacter::MoveForward(float Val)
+{
+	if (Controller && Val != 0.f)
+	{
+		// 限制俯仰值 （当角色处于行走 & 掉落状态时）
+		const bool bLimitRotation = (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling());
+		const FRotator Rotation = bLimitRotation ? GetActorRotation() : Controller->GetControlRotation();
+		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+		AddMovementInput(Direction, Val);
+	}
+}
+
+// 左右移动
+void AAnCharacter::MoveRight(float Val)
+{
+	if (Val != 0.f)
+	{
+		const FQuat Rotation = GetActorQuat();
+		const FVector Direction = FQuatRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
+		AddMovementInput(Direction, Val);
+	}
+}
+
+void AAnCharacter::MoveUp(float Val)
+{
+	if (Val != 0.f)
+	{
+		// Not when walking or falling.
+		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
+		{
+			return;
+		}
+		AddMovementInput(FVector::UpVector, Val);
+	}
+}
+
+// 左右环顾
+void AAnCharacter::TurnAtRate(float Val)
+{
+	AddControllerYawInput(Val * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+// 上下环顾
+void AAnCharacter::LookUpAtRate(float Val)
+{
+	AddControllerPitchInput(Val * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AAnCharacter::OnStartJump()
+{
+	AAnPlayerController* PC = Cast<AAnPlayerController>(Controller);
+	if(PC)
+	{
+		bPressedJump = true;
+	}
+}
+
+void AAnCharacter::OnStopJump()
+{
+	bPressedJump = false;
+	StopJumping();
+}
 
 void AAnCharacter::OnCameraUpdate(const FVector & CameraLocation, const FRotator & CameraRotation)
 {
 }
 
+// 获取瞄准偏移值
 FRotator AAnCharacter::GetAimOffsets() const
 {
-	return FRotator();
+	const FVector AimDirWS = GetBaseAimRotation().Vector();
+	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
+	const FRotator AimRotLS = AimDirLS.Rotation();
+
+	return AimRotLS;
 }
 
 
@@ -201,7 +312,7 @@ bool AAnCharacter::IsRunning() const
 	{
 		return false;
 	}
-	return false;
+	return  (!GetVelocity().IsZero() && (GetVelocity().GetSafeNormal2D() | GetActorForwardVector()) > -0.1);
 }
 
 bool AAnCharacter::IsFirstPerson() const
@@ -211,7 +322,7 @@ bool AAnCharacter::IsFirstPerson() const
 
 int32 AAnCharacter::GetMaxHealth() const
 {
-	return int32();
+	return GetClass()->GetDefaultObject<AAnCharacter>()->Health;
 }
 
 bool AAnCharacter::IsAlive() const

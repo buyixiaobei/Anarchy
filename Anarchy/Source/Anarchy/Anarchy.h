@@ -5,11 +5,14 @@
 #include "Engine.h"
 #include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
+#include "AnMovementComponent.h"
+#include "AnPlayerController.h"
 
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAnarchyGame, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogAnWeapon, Log, All);
 
+// Åö×²
 #define COLLISION_WEAPON		ECC_GameTraceChannel1
 #define COLLISION_PROJECTILE	ECC_GameTraceChannel2
 #define COLLISION_PICKUP		ECC_GameTraceChannel3

@@ -13,7 +13,7 @@ class ANARCHY_API AAnCharacter : public ACharacter
 
 public:
 	// 设置这个类的属性的默认值。
-	AAnCharacter();
+	AAnCharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,14 +21,11 @@ protected:
 
 public:
 
-	///** 开始销毁 */
-	//virtual void BeginDestroy() override;
+	/** 这个类生成时的组件初始化 */
+	virtual void PostInitializeComponents() override;
 
-	///** 这个类生成时的组件初始化 */
-	//virtual void PostInitializeComponents() override;
-
-	///** 跟新第一人称的Mesh */
-	//virtual void PawnClientRestart() override;
+	/** 客户端重启，跟新角色信息 */
+	virtual void PawnClientRestart() override;
 
 	///** [服务器] 执行PlayerState的设置 */
 	//virtual void PossessedBy(class AController* C) override;
@@ -45,8 +42,78 @@ public:
 	//// Called every frame
 	//virtual void Tick(float DeltaTime) override;
 
-	//// 调用输入的绑定功能
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	/** 开始销毁 */
+	virtual void BeginDestroy() override;
+
+	/** =================================================== 输入( Input ) ============================================== */
+
+	/** 调用输入的绑定功能 */
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	/** 左右环顾的频率值 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
+	float BaseTurnRate;
+
+	/** 上下环顾的频率值 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
+	float BaseLookUpRate;
+
+	// 前后移动
+	void MoveForward(float Val);
+
+	// 左右移动
+	void MoveRight(float Val);
+
+	/**
+	* Move Up/Down in allowed movement modes.
+	*
+	* @param Val Movment input to apply
+	*/
+	void MoveUp(float Val);
+
+	/* 每帧频率的左右 */
+	void TurnAtRate(float Val);
+
+	/* 每帧频率的上下 */
+	void LookUpAtRate(float Val);
+
+	/** 玩家开始起跳事件 */
+	void OnStartJump();
+
+	/** 玩家停止起跳事件 */
+	void OnStopJump();
+
+	/** 玩家开始跑事件 */
+	void OnStartRunning();
+
+	/** 玩家开始切换跑事件 */
+	void OnStartRunningToggle();
+
+	/** 玩家停止跑事件 */
+	void OnStopRunning();
+
+	/** 玩家开火 */
+	void OnStartFire();
+
+	/** 玩家停止开火 */
+	void OnStopFire();
+
+	/** 玩家按下目标事件 */
+	void OnStartTargeting();
+
+	/** 玩家取消按下目标事件 */
+	void OnStopTargeting();
+
+	/** 玩家选择下一个武器事件 */
+	void OnNextWeapon();
+
+	/** 玩家选择上一个武器事件 */
+	void OnPrevWeapon();
+
+	/** 玩家换弹夹事件 */
+	void OnReload();
+
+
 
 	/** =================================================== 公共方法(Common) ============================================== */
 	
@@ -142,13 +209,6 @@ public:
 
 	/** 停止播放所有的蒙太奇 */
 	void StopAllAnimMontages();
-
-
-	/** =================================================== 输入(Input Handle) ============================================== */
-
-	/** 设置特定的Pawn的输入处理 */
-	//virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
 
 	/** =================================================== 获取数据(Data) ============================================== */
 
@@ -265,12 +325,6 @@ protected:
 	/** 第生命值的百分比值 */
 	float LowHealthPercentage;
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate.基本转弯速率，在摄氏度/秒。其他缩放可能会影响最终转弯速率。 */
-	float BaseTurnRate;
-
-	/** Base lookup rate, in deg/sec. Other scaling may affect final lookup rate.基本查找率，在摄氏度/秒。其他缩放可能会影响最终查找率。 */
-	float BaseLookUpRate;
-
 	/** 在Mesh中设置团队颜色的材质实例（第三人称视图） */
 	UPROPERTY(Transient)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
@@ -351,35 +405,35 @@ public:
 	float Health;
 
 	// 玩家受伤阈值，玩家受伤情况下，移动速度 & 视觉 & 听觉全都下降
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float WoundedThreshold;
 
 	// 玩家流血阈值
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float BleedThreshold;
 
 	// 玩家受到伤害的流血阈值
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float DamageBleedThreshold;
 
 	// 可以直接完全杀死玩家的伤害阈值
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float KilDamageThreshold;
 
 	// 玩家受伤情况下的生命值丢失速率
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float WoundedHealthLossRate;
 
 	// 玩家流血情况下的生命值丢失速率
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float BleedingHealthLossRate;
 
 	// 绷带包扎恢复生命值速率
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "BandagedHealthRate(Sec)", Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Bandaged Health Rate (Sec)", Category = "Health")
 	float BandagedHealthRate;
 
 	// 玩家在受伤倒地情况下，苏醒所需要的生命值阈值
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "WoundedToReviveHealthThreshold" , Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Wounded to Revive Health Threshold" , Category = "Health")
 	float ToReviveHealthThreshold;
 
 	/** 重写处理伤害值 */
