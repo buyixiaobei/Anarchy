@@ -138,24 +138,24 @@ public:
 
 	/** =================================================== 库存系统(Inventory) ============================================== */
 
-	///** [服务器] 添加武器到库存 */
-	//void AddWeapon(class AnWeapon* Weapon);
+	/** [服务器] 添加武器到库存 */
+	void AddWeapon(class AAnWeapon* Weapon);
 
-	///** [服务器] 移除库存中指定的武器 */
-	//void RemoveWeapon(class AnWeapon* Weapon);
+	/** [服务器] 移除库存中指定的武器 */
+	void RemoveWeapon(class AAnWeapon* Weapon);
 
-	///** 在库存中找到指定的武器 */
-	//class AnWeapon* FindWeapon(TSubclassOf<class AnWeapon> WeaponClass);
+	/** 在库存中找到指定的武器 */
+	class AAnWeapon* FindWeapon(TSubclassOf<class AAnWeapon> WeaponClass);
 
-	///** [服务器 + 本地] 从库存中选择武器装备 */
-	//void EquipWeapon(class AnWeapon* Weapon);
+	/** [服务器 + 本地] 从库存中选择武器装备 */
+	void EquipWeapon(class AAnWeapon* Weapon);
 
-	///** 设置当前的武器 */
-	//void SetCurrentWeapon(class AnWeapon* NewWeapon, class AnWeapon* LastWeapon = NULL);
+	/** 设置当前的武器 */
+	void SetCurrentWeapon(class AAnWeapon* NewWeapon, class AAnWeapon* LastWeapon = NULL);
 
-	///** 当前武器的复制处理 */
-	//UFUNCTION()
-	//void OnRep_CurrentWeapon(class AnWeapon* LastWeapon);
+	/** 当前武器的复制处理 */
+	UFUNCTION()
+	void OnRep_CurrentWeapon(class AAnWeapon* LastWeapon);
 
 	/** [服务器] 生成默认的库存 */
 	void SpawnDefaultInventory();
@@ -180,19 +180,19 @@ public:
 
 	/** =================================================== 武器系统(Weapon) ============================================== */
 
-	///** [本地] 武器开始开火*/
+	/** [本地] 武器开始开火*/
 	void StartWeaponFire();
 
-	///** [本地] 武器停止开火 */
+	/** [本地] 武器停止开火 */
 	void StopWeaponFire();
 
-	///** 检查玩家是否可以开火 */
+	/** 检查玩家是否可以开火 */
 	bool CanFire() const;
 
-	///** 检查玩家是否可以跟换弹夹 */
+	/** 检查玩家是否可以跟换弹夹 */
 	bool CanReload() const;
 
-	///** [服务器 + 本地] 目标状态的改变 */
+	/** [服务器 + 本地] 目标状态的改变 */
 	void SetTargeting(bool bNewTargeting);
 
 	/** =================================================== 移动(Movement) ============================================== */
@@ -216,8 +216,8 @@ public:
 	USkeletalMeshComponent* GetPawnMesh() const;
 
 	/** 获取当前装备的武器 */
-	//UFUNCTION(BlueprintCallable, Category = "Weapon")
-	//class AShooterWeapon* GetWeapon() const;
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	class AAnWeapon* GetWeapon() const;
 
 	/** 获取武器绑定插槽名称 */
 	FName GetWeaponAttachName() const;
@@ -282,16 +282,16 @@ protected:
 	FName WeaponAttachName;
 
 	/** 默认的库存 */
-	//UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	//TArray<TSubclassOf<class AShooterWeapon> > DefaultInventoryClasses;
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TArray<TSubclassOf<class AAnWeapon>> DefaultInventoryClasses;
 
 	/** 库存中的武器 */
-	//UPROPERTY(Transient, Replicated)
-	//TArray<class AShooterWeapon*> Inventory;
+	UPROPERTY(Transient, Replicated)
+	TArray<class AAnWeapon*> Inventory;
 
 	/** 当前装备的武器 */
-	//UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
-	//class AShooterWeapon* CurrentWeapon;
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	class AAnWeapon* CurrentWeapon;
 
 	/** 复制最后一次被击中和伤害的信息 */
 	//UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)

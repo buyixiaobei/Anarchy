@@ -270,9 +270,14 @@ USkeletalMeshComponent * AAnCharacter::GetPawnMesh() const
 	return nullptr;
 }
 
+AAnWeapon * AAnCharacter::GetWeapon() const
+{
+	return CurrentWeapon;
+}
+
 FName AAnCharacter::GetWeaponAttachName() const
 {
-	return FName();
+	return WeaponAttachName;
 }
 
 int32 AAnCharacter::GetInventoryCount() const
@@ -399,17 +404,17 @@ void AAnCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// only to local owner: weapon change requests are locally instigated, other clients don't need it
-	//DOREPLIFETIME_CONDITION(AShooterCharacter, Inventory, COND_OwnerOnly);
+	// 只有本地所有者：武器更改请求是本地发起的，其他客户不需要它。
+	DOREPLIFETIME_CONDITION(AAnCharacter, Inventory, COND_OwnerOnly);
 
-	// everyone except local owner: flag change is locally instigated
-	//DOREPLIFETIME_CONDITION(AShooterCharacter, bIsTargeting, COND_SkipOwner);
-	//DOREPLIFETIME_CONDITION(AShooterCharacter, bWantsToRun, COND_SkipOwner);
-	//DOREPLIFETIME_CONDITION(AShooterCharacter, LastTakeHitInfo, COND_Custom);
+	// 除了本地拥有者以外的所有人：标识变更都是本地造成的。
+	//DOREPLIFETIME_CONDITION(AAnCharacter, bIsTargeting, COND_SkipOwner);
+	//DOREPLIFETIME_CONDITION(AAnCharacter, bWantsToRun, COND_SkipOwner);
+	//DOREPLIFETIME_CONDITION(AAnCharacter, LastTakeHitInfo, COND_Custom);
 
-	// everyone
-	//DOREPLIFETIME(AShooterCharacter, CurrentWeapon);
-	//DOREPLIFETIME(AShooterCharacter, Health);
+	// 所有人都拥有的
+	DOREPLIFETIME(AAnCharacter, CurrentWeapon);
+	//DOREPLIFETIME(AAnCharacter, Health);
 }
 
 
@@ -433,13 +438,27 @@ void AAnCharacter::OnRep_LastTakeHitInfo()
 {
 }
 
-/*oid AAnCharacter::SetCurrentWeapon(AShooterWeapon * NewWeapon, AShooterWeapon * LastWeapon)
+void AAnCharacter::SetCurrentWeapon(AAnWeapon * NewWeapon, AAnWeapon * LastWeapon)
 {
-}*/
+	AAnWeapon * LocalWeapon = NULL;
+	if (LastWeapon != NULL) 
+	{
+		LocalWeapon = LastWeapon;
+	}
+	else if(NewWeapon != CurrentWeapon)
+	{
+		LocalWeapon = CurrentWeapon;
+	}
 
-/*oid AAnCharacter::OnRep_CurrentWeapon(AShooterWeapon * LastWeapon)
+	// 解除上一次装备的武器
+
+	// 装备新的武器
+}
+
+void AAnCharacter::OnRep_CurrentWeapon(AAnWeapon * LastWeapon)
 {
-}*/
+	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+}
 
 void AAnCharacter::SpawnDefaultInventory()
 {
