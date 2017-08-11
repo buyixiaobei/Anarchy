@@ -27,14 +27,14 @@ class USoundCue;
 //	};
 //}
 
-UENUM()
-enum EWeaponState
-{
-	Idle,
-	Firing,
-	Reloading,
-	Equipping,
-};
+//UENUM()
+//enum EWeaponState
+//{
+//	Idle,
+//	Firing,
+//	Reloading,
+//	Equipping,
+//};
 
 USTRUCT()
 struct FWeaponData
@@ -97,14 +97,70 @@ struct FWeaponAnim
 };
 
 
-UCLASS(abstract)
+UCLASS()
 class ANARCHY_API AAnWeapon : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:	
 	// Sets default values for this actor's properties
 	AAnWeapon();
+
+	/** 平台的初始化设置 */
+	//virtual void PostInitializeComponents() override;
+
+	//virtual void Destroyed() override;
+
+	/** =================================================== 子弹( Ammo ) ============================================== */
+
+	// 子弹类型枚举
+	enum class EAmmoType
+	{
+		EBullet,
+		ERocket,
+		EMax,
+	};
+
+	/** [服务器] 添加子弹 */
+	void GiveAmmo(int AddAmount);
+
+	/** 消耗子弹 */
+	void UseAmmo();
+
+	/** 查询弹药类型 */
+	virtual EAmmoType GetAmmoType() const
+	{
+		return EAmmoType::EBullet;
+	}
+
+	/** =================================================== 库存( Inventory ) ============================================== */
+
+	/** 武器开始被指定的玩家装备 */
+	virtual void OnEquip(const AAnWeapon* LastWeapon);
+
+	/** 武器已被指定的玩家装备 */
+	virtual void OnEquipFinished();
+
+	/** 武器被指定的玩家解除装备 */
+	virtual void OnUnEquip();
+
+	///** [服务器] 武器已经被添加进入库存 */
+	//virtual void OnEnterInventory(AAnCharacter* NewOwner);
+
+	///** [服务器] 武器已经从库存中移除 */
+	//virtual void OnLeaveInventory();
+
+	/** 检查当前要装备的东西是否已装备 */
+	bool IsEquipped() const;
+
+	/** 检查Mesh是否已经绑定到Pawn上 */
+	bool IsAttachedToPawn() const;
+
+
+	/** 设置这个武器的拥有者 */
+	void SetOwningPawn(AAnCharacter* AnCharacter);
+
+
 
 protected:
 	// Called when the game starts or when spawned

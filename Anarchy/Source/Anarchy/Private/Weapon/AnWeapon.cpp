@@ -1,13 +1,53 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AnWeapon.h"
+#include "Anarchy.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
-// Sets default values
+
+// 设置默认的值
 AAnWeapon::AAnWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+//void AAnWeapon::PostInitializeComponents()
+//{
+//	Super::PostInitializeComponents();
+//}
+//
+//void AAnWeapon::Destroyed()
+//{
+//	Super::Destroyed();
+//}
+
+/** =================================================== 子弹( Ammo ) ============================================== */
+
+void AAnWeapon::GiveAmmo(int AddAmount)
+{
+	
+}
+
+void AAnWeapon::UseAmmo()
+{
+	
+}
+
+/** =================================================== 库存( Inventory ) ============================================== */
+
+void AAnWeapon::OnEquip(const AAnWeapon* LastWeapon)
+{
+
+}
+
+void AAnWeapon::OnEquipFinished()
+{
+
+}
+
+void AAnWeapon::OnUnEquip()
+{
 
 }
 
@@ -23,5 +63,10 @@ void AAnWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AAnWeapon::SetOwningPawn(AAnCharacter* AnCharacter)
+{
+	
 }
 

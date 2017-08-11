@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AnCharacter.h"
+#include "Weapon/AnWeapon.h"
+#include "Weapon/AnDamageType.h"
 #include "Anarchy.h"
 
 
@@ -451,8 +453,19 @@ void AAnCharacter::SetCurrentWeapon(AAnWeapon * NewWeapon, AAnWeapon * LastWeapo
 	}
 
 	// 解除上一次装备的武器
+	if (LocalWeapon)
+	{
+		LocalWeapon->OnUnEquip();
+	}
+
+	CurrentWeapon = NewWeapon;
 
 	// 装备新的武器
+	if (NewWeapon)
+	{
+		NewWeapon->SetOwningPawn(this);
+		NewWeapon->OnEquip(LastWeapon);
+	}
 }
 
 void AAnCharacter::OnRep_CurrentWeapon(AAnWeapon * LastWeapon)
