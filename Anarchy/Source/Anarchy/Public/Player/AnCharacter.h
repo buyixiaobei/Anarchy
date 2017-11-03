@@ -164,8 +164,8 @@ public:
 	void DestroyInventory();
 
 	/** [服务器] 装备武器 */
-	//UFUNCTION(reliable, server, WithValidation)
-	//void ServerEquipWeapon(class AShooterWeapon* NewWeapon);
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerEquipWeapon(class AAnWeapon* NewWeapon);
 
 	///** [服务器] 跟新目标状态 */
 	//UFUNCTION(reliable, server, WithValidation)
@@ -201,6 +201,7 @@ public:
 
 
 	/** =================================================== 动画(Animations) ============================================== */
+	
 	/** 播放蒙太奇动画 */
 	virtual float PlayAnimMontage(class UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
 
@@ -265,12 +266,8 @@ public:
 	/** 返回低生命值时的百分比 */
 	float GetLowHealthPercentage() const;
 
-	/*
-	* Get either first or third person mesh.
-	*
-	* @param	WantFirstPerson		If true returns the first peron mesh, else returns the third
-	*/
-	//USkeletalMeshComponent* GetSpecifcPawnMesh(bool WantFirstPerson) const;
+	/** 如果Ture，则返回第一人称角色，否则返回第三人称角色 */
+	USkeletalMeshComponent* GetSpecifcPawnMesh(bool WantFirstPerson) const;
 
 	/** 更新所有玩家角色的团队颜色。 */
 	void UpdateTeamColorsAllMIDs();
@@ -382,6 +379,10 @@ protected:
 	virtual void TornOff();
 
 private:
+
+	/** 第一人称角色 */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* PawnMesh1P;
 
 	/** 角色是否移动（基于运动输入） */
 	bool IsMoving();

@@ -2,7 +2,6 @@
 
 #include "AnCharacter.h"
 #include "Weapon/AnWeapon.h"
-#include "Weapon/AnDamageType.h"
 #include "Anarchy.h"
 
 
@@ -11,15 +10,26 @@
 AAnCharacter::AAnCharacter(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAnMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+	PawnMesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PawnMesh1P"));
+	PawnMesh1P->SetupAttachment(GetCapsuleComponent());
+	PawnMesh1P->bOnlyOwnerSee = true;
+	PawnMesh1P->bOwnerNoSee = false;
+	PawnMesh1P->bCastDynamicShadow = false;
+	PawnMesh1P->bReceivesDecals = false;
+	PawnMesh1P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	PawnMesh1P->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	PawnMesh1P->SetCollisionObjectType(ECC_Pawn);
+	PawnMesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PawnMesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	//GetMesh()->bOnlyOwnerSee = false;
-	//GetMesh()->bOwnerNoSee = true;
-	//GetMesh()->bReceivesDecals = true;
-	//GetMesh()->SetCollisionObjectType(ECC_Pawn);
-	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
-	//GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
-	//GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->bOnlyOwnerSee = false;
+	GetMesh()->bOwnerNoSee = true;
+	GetMesh()->bReceivesDecals = true;
+	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
@@ -31,6 +41,7 @@ AAnCharacter::AAnCharacter(const FObjectInitializer& ObjectInitializer)
 	RunningSpeedModifier = 1.5f;
 	bWantsToRun = false;
 	bWantsToFire = false;
+
 	LowHealthPercentage = 0.5f;
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -49,7 +60,11 @@ void AAnCharacter::PostInitializeComponents()
 	
 	if(Role == ROLE_Authority)
 	{
+		// 最大生命值
 		Health = GetMaxHealth();
+
+		// 生成默认的装备库存
+		SpawnDefaultInventory();
 	}
 }
 
@@ -184,12 +199,14 @@ void AAnCharacter::OnStartJump()
 	}
 }
 
+// 停止跳跃
 void AAnCharacter::OnStopJump()
 {
 	bPressedJump = false;
 	StopJumping();
 }
 
+// 摄像机更新
 void AAnCharacter::OnCameraUpdate(const FVector & CameraLocation, const FRotator & CameraRotation)
 {
 }
@@ -210,22 +227,6 @@ bool AAnCharacter::IsEnemyFor(AController * TempController) const
 	return false;
 }
 
-//void AAnCharacter::AddWeapon(AShooterWeapon * Weapon)
-//{
-//}
-//
-//void AAnCharacter::RemoveWeapon(AShooterWeapon * Weapon)
-//{
-//}
-
-//AShooterWeapon * AAnCharacter::FindWeapon(TSubclassOf<class AShooterWeapon> WeaponClass)
-//{
-//	return nullptr;
-//}
-
-//void AAnCharacter::EquipWeapon(AShooterWeapon * Weapon)
-//{
-//}
 
 void AAnCharacter::StartWeaponFire()
 {
@@ -249,9 +250,15 @@ void AAnCharacter::SetTargeting(bool bNewTargeting)
 {
 }
 
-
+// 播放动画蒙太奇
 float AAnCharacter::PlayAnimMontage(UAnimMontage * AnimMontage, float InPlayRate, FName StartSectionName)
 {
+	USkeletalMeshComponent* UseMesh = GetPawnMesh();
+	if (AnimMontage && UseMesh && UseMesh->AnimScriptInstance)
+	{
+		return UseMesh->AnimScriptInstance->Montage_Play(AnimMontage, InPlayRate);
+	}
+
 	return 0.0f;
 }
 
@@ -267,9 +274,11 @@ void AAnCharacter::StopAllAnimMontages()
 //{
 //}
 
+/** =================================================== 数据获取(Getter) ============================================== */
+
 USkeletalMeshComponent * AAnCharacter::GetPawnMesh() const
 {
-	return nullptr;
+	return IsFirstPerson() ? PawnMesh1P : GetPawnMesh();
 }
 
 AAnWeapon * AAnCharacter::GetWeapon() const
@@ -322,24 +331,33 @@ bool AAnCharacter::IsRunning() const
 	return  (!GetVelocity().IsZero() && (GetVelocity().GetSafeNormal2D() | GetActorForwardVector()) > -0.1);
 }
 
+// 角色是否是第一人称
 bool AAnCharacter::IsFirstPerson() const
 {
 	return false;
+	//return IsAlive() && Controller->IsLocalPlayerController();
 }
 
+// 获取角色最大生命值
 int32 AAnCharacter::GetMaxHealth() const
 {
 	return GetClass()->GetDefaultObject<AAnCharacter>()->Health;
 }
 
+// 角色是否还活着
 bool AAnCharacter::IsAlive() const
 {
-	return false;
+	return Health > 0 ? true : false;
 }
 
 float AAnCharacter::GetLowHealthPercentage() const
 {
 	return 0.0f;
+}
+
+USkeletalMeshComponent * AAnCharacter::GetSpecifcPawnMesh(bool WantFirstPerson) const
+{
+	return WantFirstPerson == true ? PawnMesh1P : GetMesh();
 }
 
 void AAnCharacter::UpdateTeamColorsAllMIDs()
@@ -410,13 +428,13 @@ void AAnCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	DOREPLIFETIME_CONDITION(AAnCharacter, Inventory, COND_OwnerOnly);
 
 	// 除了本地拥有者以外的所有人：标识变更都是本地造成的。
-	//DOREPLIFETIME_CONDITION(AAnCharacter, bIsTargeting, COND_SkipOwner);
-	//DOREPLIFETIME_CONDITION(AAnCharacter, bWantsToRun, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AAnCharacter, bIsTargeting, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AAnCharacter, bWantsToRun, COND_SkipOwner);
 	//DOREPLIFETIME_CONDITION(AAnCharacter, LastTakeHitInfo, COND_Custom);
 
 	// 所有人都拥有的
 	DOREPLIFETIME(AAnCharacter, CurrentWeapon);
-	//DOREPLIFETIME(AAnCharacter, Health);
+	DOREPLIFETIME(AAnCharacter, Health);
 }
 
 
@@ -440,9 +458,11 @@ void AAnCharacter::OnRep_LastTakeHitInfo()
 {
 }
 
+/** =================================================== 武器( Weapon ) ============================================== */
+
 void AAnCharacter::SetCurrentWeapon(AAnWeapon * NewWeapon, AAnWeapon * LastWeapon)
 {
-	AAnWeapon * LocalWeapon = NULL;
+	AAnWeapon* LocalWeapon = NULL;
 	if (LastWeapon != NULL) 
 	{
 		LocalWeapon = LastWeapon;
@@ -475,15 +495,85 @@ void AAnCharacter::OnRep_CurrentWeapon(AAnWeapon * LastWeapon)
 
 void AAnCharacter::SpawnDefaultInventory()
 {
+	// 如果当前角色权限小于3，则返回
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
+
+	// 获取默认的库存数
+	int32 NumWeaponClasses = DefaultInventoryClasses.Num();
+
+	// 遍历每个库存类并生成对应的武器
+	for (int32 i = 0; i < NumWeaponClasses; i++)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AAnWeapon* NewWeapon = GetWorld()->SpawnActor<AAnWeapon>(DefaultInventoryClasses[i], SpawnInfo);
+		AddWeapon(NewWeapon);
+	}
+
+	// 装备库存中的第一个武器
+	if (Inventory.Num() > 0)
+	{
+		EquipWeapon(Inventory[0]);
+	}
 }
 
 void AAnCharacter::DestroyInventory()
 {
 }
 
-//oid AAnCharacter::ServerEquipWeapon(AShooterWeapon * NewWeapon)
+void AAnCharacter::AddWeapon(AAnWeapon * Weapon)
+{
+	if (Weapon && Role == ROLE_Authority)
+	{
+		// 当前武器存储入库存中
+		Weapon->OnEnterInventory(this);
+		Inventory.AddUnique(Weapon);
+	}
+}
+
+void AAnCharacter::RemoveWeapon(AAnWeapon * Weapon)
+{
+	if (Weapon && Role == ROLE_Authority)
+	{
+		// 移除当前库存中的武器
+		Weapon->OnLeaveInventory();
+		Inventory.RemoveSingle(Weapon);
+	}
+}
+
+//AShooterWeapon * AAnCharacter::FindWeapon(TSubclassOf<class AShooterWeapon> WeaponClass)
 //{
+//	return nullptr;
 //}
+
+void AAnCharacter::EquipWeapon(AAnWeapon * Weapon)
+{
+	if (Weapon)
+	{
+		if (Role == ROLE_Authority)
+		{
+			SetCurrentWeapon(Weapon, CurrentWeapon);
+		}
+		else
+		{
+			//ServerEquipWeapon(Weapon);
+		}
+	}
+
+}
+
+bool AAnCharacter::ServerEquipWeapon_Validate(AAnWeapon* Weapon)
+{
+	return true;
+}
+
+void AAnCharacter::ServerEquipWeapon_Implementation(AAnWeapon* Weapon)
+{
+	EquipWeapon(Weapon);
+}
 
 //bool AAnCharacter::ServerSetTargeting_Validate(bool bNewTargeting)
 //{
